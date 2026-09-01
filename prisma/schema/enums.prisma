@@ -1,0 +1,17 @@
+enum Role {
+    CUSTOMER
+    TECHNICIAN
+    ADMIN
+}
+
+enum UserStatus {
+    ACTIVE
+    BLOCKED
+    DELETED
+}
+
+enum Gender {
+    MALE
+    FEMALE
+    OTHER
+}
