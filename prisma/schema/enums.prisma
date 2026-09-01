@@ -1,17 +1,34 @@
 enum Role {
-    CUSTOMER
-    TECHNICIAN
-    ADMIN
+  CUSTOMER
+  TECHNICIAN
+  ADMIN
 }
 
 enum UserStatus {
-    ACTIVE
-    BLOCKED
-    DELETED
+  ACTIVE
+  INACTIVE
+  BANNED
 }
 
-enum Gender {
-    MALE
-    FEMALE
-    OTHER
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  BKASH
+  STRIPE
+  SSLCOMMERZ
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
 }

@@ -20,17 +20,40 @@ export type Role = (typeof Role)[keyof typeof Role]
 
 export const UserStatus = {
   ACTIVE: 'ACTIVE',
-  BLOCKED: 'BLOCKED',
-  DELETED: 'DELETED'
+  INACTIVE: 'INACTIVE',
+  BANNED: 'BANNED'
 } as const
 
 export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus]
 
 
-export const Gender = {
-  MALE: 'MALE',
-  FEMALE: 'FEMALE',
-  OTHER: 'OTHER'
+export const BookingStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
 } as const
 
-export type Gender = (typeof Gender)[keyof typeof Gender]
+export type BookingStatus = (typeof BookingStatus)[keyof typeof BookingStatus]
+
+
+export const PaymentMethod = {
+  BKASH: 'BKASH',
+  STRIPE: 'STRIPE',
+  SSLCOMMERZ: 'SSLCOMMERZ'
+} as const
+
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
+
+
+export const PaymentStatus = {
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED'
+} as const
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
