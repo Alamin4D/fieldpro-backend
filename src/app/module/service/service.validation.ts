@@ -34,6 +34,7 @@ export const updateServiceSchema = createServiceSchema.partial().extend({
 
 export const serviceQuerySchema = z.object({
 	search: z.string().optional(),
+    
 	category: z.string().optional(),
 
 	isActive: z.enum(["true", "false"]).optional(),
