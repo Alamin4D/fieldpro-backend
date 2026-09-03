@@ -1,4 +1,4 @@
-import type { Role } from "../../generated/prisma/enums";
+import { Role } from "../../../generated/prisma/enums";
 
 export interface IRegisterUserPayload {
 	name: string;

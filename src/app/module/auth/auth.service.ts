@@ -15,14 +15,18 @@ import type {
 	IVerifyEmailPayload,
 } from "./auth.interface";
 import httpStatus from "http-status";
-import config from "../config";
-import { googleClient } from "../lib/googleAuth";
-import { prisma } from "../lib/prisma";
-import { AppError } from "../utils/AppError";
-import { jwtUtils } from "../utils/jwt";
-import { redisClient } from "../lib/redis";
-import { transporter } from "../lib/nodemailer";
-import { AuthProvider, Role, UserStatus } from "../../generated/prisma/enums";
+import config from "../../config";
+import { googleClient } from "../../lib/googleAuth";
+import { prisma } from "../../lib/prisma";
+import { AppError } from "../../utils/AppError";
+import { jwtUtils } from "../../utils/jwt";
+import { redisClient } from "../../lib/redis";
+import { transporter } from "../../lib/nodemailer";
+import {
+	AuthProvider,
+	Role,
+	UserStatus,
+} from "../../../generated/prisma/enums";
 
 // CONSTANTS
 const OTP_EXPIRATION_SECONDS = 5 * 60;
@@ -694,7 +698,6 @@ const resetPassword = async (payload: IResetPasswordPayload) => {
 		message: "Password has been reset successfully.",
 	};
 };
-
 
 export const AuthService = {
 	registerUser,
