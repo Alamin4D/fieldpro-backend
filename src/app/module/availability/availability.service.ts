@@ -281,7 +281,6 @@ const getTechnicianAvailability = async (
 };
 
 
-
 const updateAvailability = async (
   technicianUserId: string,
   availabilityId: string,
