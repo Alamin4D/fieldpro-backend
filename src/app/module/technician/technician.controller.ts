@@ -4,8 +4,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 
 import { TechnicianService } from "./technician.service";
-import httpStatus from "http-status"
-
+import httpStatus from "http-status";
 
 const createTechnicianProfile = catchAsync(
 	async (req: Request, res: Response) => {
@@ -23,7 +22,6 @@ const createTechnicianProfile = catchAsync(
 	},
 );
 
-
 const getMyTechnicianProfile = catchAsync(
 	async (req: Request, res: Response) => {
 		const result = await TechnicianService.getMyTechnicianProfile(
@@ -38,7 +36,6 @@ const getMyTechnicianProfile = catchAsync(
 		});
 	},
 );
-
 
 const updateMyTechnicianProfile = catchAsync(
 	async (req: Request, res: Response) => {
@@ -56,7 +53,6 @@ const updateMyTechnicianProfile = catchAsync(
 	},
 );
 
-
 const getAllTechnicians = catchAsync(async (req: Request, res: Response) => {
 	const result = await TechnicianService.getAllTechnicians(req.query as any);
 
@@ -67,7 +63,6 @@ const getAllTechnicians = catchAsync(async (req: Request, res: Response) => {
 		data: result,
 	});
 });
-
 
 const getTechnicianById = catchAsync(async (req: Request, res: Response) => {
 	const result = await TechnicianService.getTechnicianById(
@@ -82,7 +77,6 @@ const getTechnicianById = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
-
 const toggleAvailability = catchAsync(async (req: Request, res: Response) => {
 	const result = await TechnicianService.toggleAvailability(req.user!?.userId);
 
@@ -93,7 +87,6 @@ const toggleAvailability = catchAsync(async (req: Request, res: Response) => {
 		data: result,
 	});
 });
-
 
 export const TechnicianController = {
 	createTechnicianProfile,

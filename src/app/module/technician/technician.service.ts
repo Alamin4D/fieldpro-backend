@@ -1,7 +1,7 @@
 import { Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
-import httpStatus from "http-status"
+import httpStatus from "http-status";
 
 import {
 	CreateTechnicianProfileInput,
@@ -24,7 +24,10 @@ const createTechnicianProfile = async (
 	}
 
 	if (user.role !== "TECHNICIAN") {
-		throw new AppError(httpStatus.FORBIDDEN, "Only technicians can create technician profiles");
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"Only technicians can create technician profiles",
+		);
 	}
 
 	const existingProfile = await prisma.technicianProfile.findUnique({
@@ -34,7 +37,10 @@ const createTechnicianProfile = async (
 	});
 
 	if (existingProfile) {
-		throw new AppError(httpStatus.CONFLICT, "Technician profile already exists");
+		throw new AppError(
+			httpStatus.CONFLICT,
+			"Technician profile already exists",
+		);
 	}
 
 	const profile = await prisma.technicianProfile.create({
