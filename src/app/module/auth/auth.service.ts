@@ -255,7 +255,7 @@ const verifyEmail = async (payload: IVerifyEmailPayload) => {
 
 	const templatePath = path.join(
 		process.cwd(),
-		"src/app/templates/user-welcome-email.ejs",
+		"src/app/templates/welcome-email.ejs",
 	);
 
 	try {
@@ -266,7 +266,7 @@ const verifyEmail = async (payload: IVerifyEmailPayload) => {
 		await transporter.sendMail({
 			from: config.email_sender,
 			to: createdUser.email,
-			subject: "Welcome to FixItNow",
+			subject: "Welcome to Field Service Management",
 			html,
 		});
 	} catch (error) {

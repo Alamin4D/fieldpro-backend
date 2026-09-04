@@ -11,6 +11,7 @@ import config from "./app/config";
 import { notFound } from "./app/middleware/notFound";
 import { AuthRoutes } from "./app/module/auth/auth.route";
 import { ServiceRoutes } from "./app/module/service/service.route";
+import { TechnicianRoutes } from "./app/module/technician/technician.route";
 
 const app: Application = express();
 
@@ -30,12 +31,13 @@ app.use(cookieParser());
 
 app.use("/api/v1/auth", AuthRoutes);
 app.use("/api/v1/service", ServiceRoutes);
+app.use("/api/v1/technician", TechnicianRoutes);
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {
 	res.status(httpStatus.OK).json({
 		success: true,
-		message: "Welcome to FieldPro Backend",
+		message: "Welcome to Field Service Management",
 	});
 });
 
