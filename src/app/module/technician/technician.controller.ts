@@ -94,6 +94,7 @@ const toggleAvailability = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+
 export const TechnicianController = {
 	createTechnicianProfile,
 	getMyTechnicianProfile,
