@@ -11,18 +11,13 @@ import { Role } from "../../../generated/prisma/enums";
 
 const router = Router();
 
-
-
-
 router.get(
 	"/",
 	validateRequest(serviceQuerySchema),
 	ServiceController.getAllServices,
 );
 
-
 router.get("/:id", ServiceController.getServiceById);
-
 
 router.post(
 	"/",
@@ -31,14 +26,12 @@ router.post(
 	ServiceController.createService,
 );
 
-
 router.patch(
 	"/:id",
 	auth(Role.ADMIN),
 	validateRequest(updateServiceSchema),
 	ServiceController.updateService,
 );
-
 
 router.delete("/:id", auth(Role.ADMIN), ServiceController.deleteService);
 

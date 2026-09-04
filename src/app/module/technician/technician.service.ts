@@ -1,370 +1,286 @@
-
-
 import { Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
+import httpStatus from "http-status"
 
 import {
-  CreateTechnicianProfileInput,
-  TechnicianQueryInput,
-  UpdateTechnicianProfileInput,
+	CreateTechnicianProfileInput,
+	TechnicianQueryInput,
+	UpdateTechnicianProfileInput,
 } from "./technician.validation";
 
-/**
- * Create Technician Profile
- */
 const createTechnicianProfile = async (
-  userId: string,
-  payload: CreateTechnicianProfileInput
+	userId: string,
+	payload: CreateTechnicianProfileInput,
 ) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-  });
+	const user = await prisma.user.findUnique({
+		where: {
+			id: userId,
+		},
+	});
 
-  if (!user) {
-    throw new AppError(
-      404,
-      "User not found"
-    );
-  }
+	if (!user) {
+		throw new AppError(httpStatus.NOT_FOUND, "User not found");
+	}
 
-  if (user.role !== "TECHNICIAN") {
-    throw new AppError(
-      403,
-      "Only technicians can create technician profiles"
-    );
-  }
+	if (user.role !== "TECHNICIAN") {
+		throw new AppError(httpStatus.FORBIDDEN, "Only technicians can create technician profiles");
+	}
 
-  const existingProfile =
-    await prisma.technicianProfile.findUnique({
-      where: {
-        userId,
-      },
-    });
+	const existingProfile = await prisma.technicianProfile.findUnique({
+		where: {
+			userId,
+		},
+	});
 
-  if (existingProfile) {
-    throw new AppError(
-      409,
-      "Technician profile already exists"
-    );
-  }
+	if (existingProfile) {
+		throw new AppError(httpStatus.CONFLICT, "Technician profile already exists");
+	}
 
-  const profile =
-    await prisma.technicianProfile.create({
-      data: {
-        userId,
-        bio: payload.bio,
-        experience: payload.experience,
-        specialization:
-          payload.specialization,
-        hourlyRate: new Prisma.Decimal(
-          payload.hourlyRate
-        ),
-      },
+	const profile = await prisma.technicianProfile.create({
+		data: {
+			userId,
+			bio: payload.bio,
+			experience: payload.experience,
+			specialization: payload.specialization,
+			hourlyRate: new Prisma.Decimal(payload.hourlyRate),
+		},
 
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            avatar: true,
-          },
-        },
-      },
-    });
+		include: {
+			user: {
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					phone: true,
+					avatar: true,
+				},
+			},
+		},
+	});
 
-  return profile;
+	return profile;
 };
 
-/**
- * Get Own Technician Profile
- */
-const getMyTechnicianProfile =
-  async (userId: string) => {
-    const profile =
-      await prisma.technicianProfile.findUnique({
-        where: {
-          userId,
-        },
+const getMyTechnicianProfile = async (userId: string) => {
+	const profile = await prisma.technicianProfile.findUnique({
+		where: {
+			userId,
+		},
 
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              phone: true,
-              avatar: true,
-            },
-          },
-        },
-      });
+		include: {
+			user: {
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					phone: true,
+					avatar: true,
+				},
+			},
+		},
+	});
 
-    if (!profile) {
-      throw new AppError(
-        404,
-        "Technician profile not found"
-      );
-    }
+	if (!profile) {
+		throw new AppError(httpStatus.NOT_FOUND, "Technician profile not found");
+	}
 
-    return profile;
-  };
+	return profile;
+};
 
-/**
- * Update Own Technician Profile
- */
-const updateMyTechnicianProfile =
-  async (
-    userId: string,
-    payload: UpdateTechnicianProfileInput
-  ) => {
-    const existingProfile =
-      await prisma.technicianProfile.findUnique({
-        where: {
-          userId,
-        },
-      });
+const updateMyTechnicianProfile = async (
+	userId: string,
+	payload: UpdateTechnicianProfileInput,
+) => {
+	const existingProfile = await prisma.technicianProfile.findUnique({
+		where: {
+			userId,
+		},
+	});
 
-    if (!existingProfile) {
-      throw new AppError(
-        404,
-        "Technician profile not found"
-      );
-    }
+	if (!existingProfile) {
+		throw new AppError(httpStatus.NOT_FOUND, "Technician profile not found");
+	}
 
-    const profile =
-      await prisma.technicianProfile.update({
-        where: {
-          userId,
-        },
+	const profile = await prisma.technicianProfile.update({
+		where: {
+			userId,
+		},
 
-        data: {
-          ...(payload.bio !== undefined && {
-            bio: payload.bio,
-          }),
+		data: {
+			...(payload.bio !== undefined && {
+				bio: payload.bio,
+			}),
 
-          ...(payload.experience !==
-            undefined && {
-            experience:
-              payload.experience,
-          }),
+			...(payload.experience !== undefined && {
+				experience: payload.experience,
+			}),
 
-          ...(payload.specialization !==
-            undefined && {
-            specialization:
-              payload.specialization,
-          }),
+			...(payload.specialization !== undefined && {
+				specialization: payload.specialization,
+			}),
 
-          ...(payload.hourlyRate !==
-            undefined && {
-            hourlyRate:
-              new Prisma.Decimal(
-                payload.hourlyRate
-              ),
-          }),
-        },
+			...(payload.hourlyRate !== undefined && {
+				hourlyRate: new Prisma.Decimal(payload.hourlyRate),
+			}),
+		},
 
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              phone: true,
-              avatar: true,
-            },
-          },
-        },
-      });
+		include: {
+			user: {
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					phone: true,
+					avatar: true,
+				},
+			},
+		},
+	});
 
-    return profile;
-  };
+	return profile;
+};
 
-/**
- * Get All Technicians
- */
 const getAllTechnicians = async (query: TechnicianQueryInput) => {
-  const {
-    search,
-    specialization,
-    isAvailable,
-    minRate,
-    maxRate,
-    page = 1, // Fallback default to prevent NaN in skip
-    limit = 10, // Fallback default
-  } = query;
+	const {
+		search,
+		specialization,
+		isAvailable,
+		minRate,
+		maxRate,
+		page = 1,
+		limit = 10,
+	} = query;
 
-  const skip = (page - 1) * limit;
-  
-  // Use an array to securely combine multiple independent conditions
-  const andConditions: Prisma.TechnicianProfileWhereInput[] = [];
+	const skip = (page - 1) * limit;
 
-  /**
-   * Search (Applies OR logic across fields)
-   */
-  if (search) {
-    andConditions.push({
-      OR: [
-        { specialization: { contains: search, mode: "insensitive" } },
-        { bio: { contains: search, mode: "insensitive" } },
-        { user: { name: { contains: search, mode: "insensitive" } } },
-      ],
-    });
-  }
+	const andConditions: Prisma.TechnicianProfileWhereInput[] = [];
 
-  /**
-   * Specialization Filter
-   */
-  if (specialization) {
-    andConditions.push({
-      specialization: { contains: specialization, mode: "insensitive" },
-    });
-  }
+	if (search) {
+		andConditions.push({
+			OR: [
+				{ specialization: { contains: search, mode: "insensitive" } },
+				{ bio: { contains: search, mode: "insensitive" } },
+				{ user: { name: { contains: search, mode: "insensitive" } } },
+			],
+		});
+	}
 
-  /**
-   * Availability Filter
-   */
-  if (isAvailable !== undefined) {
-    andConditions.push({
-      isAvailable: isAvailable === "true" // Safeguard boolean/string types
-    });
-  }
+	if (specialization) {
+		andConditions.push({
+			specialization: { contains: specialization, mode: "insensitive" },
+		});
+	}
 
-  /**
-   * Hourly Rate Filter
-   */
-  if (minRate !== undefined || maxRate !== undefined) {
-    const rateCondition: Prisma.TechnicianProfileWhereInput["hourlyRate"] = {};
-    
-    if (minRate !== undefined) {
-      rateCondition.gte = new Prisma.Decimal(minRate);
-    }
-    if (maxRate !== undefined) {
-      rateCondition.lte = new Prisma.Decimal(maxRate);
-    }
-    
-    andConditions.push({ hourlyRate: rateCondition });
-  }
+	if (isAvailable !== undefined) {
+		andConditions.push({
+			isAvailable: isAvailable === "true", // Safeguard boolean/string types
+		});
+	}
 
-  // Construct final where clause: only apply AND if conditions exist
-  const where: Prisma.TechnicianProfileWhereInput = 
-    andConditions.length > 0 ? { AND: andConditions } : {};
+	if (minRate !== undefined || maxRate !== undefined) {
+		const rateCondition: Prisma.TechnicianProfileWhereInput["hourlyRate"] = {};
 
-  // Execute Transaction
-  const [technicians, total] = await prisma.$transaction([
-    prisma.technicianProfile.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: [
-        { rating: "desc" },
-        { createdAt: "desc" },
-      ],
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            avatar: true,
-          },
-        },
-      },
-    }),
-    prisma.technicianProfile.count({ where }),
-  ]);
+		if (minRate !== undefined) {
+			rateCondition.gte = new Prisma.Decimal(minRate);
+		}
+		if (maxRate !== undefined) {
+			rateCondition.lte = new Prisma.Decimal(maxRate);
+		}
 
-  return {
-    meta: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    },
-    data: technicians,
-  };
+		andConditions.push({ hourlyRate: rateCondition });
+	}
+
+	const where: Prisma.TechnicianProfileWhereInput =
+		andConditions.length > 0 ? { AND: andConditions } : {};
+
+	const [technicians, total] = await prisma.$transaction([
+		prisma.technicianProfile.findMany({
+			where,
+			skip,
+			take: limit,
+			orderBy: [{ rating: "desc" }, { createdAt: "desc" }],
+			include: {
+				user: {
+					select: {
+						id: true,
+						name: true,
+						email: true,
+						phone: true,
+						avatar: true,
+					},
+				},
+			},
+		}),
+		prisma.technicianProfile.count({ where }),
+	]);
+
+	return {
+		meta: {
+			page,
+			limit,
+			total,
+			totalPages: Math.ceil(total / limit),
+		},
+		data: technicians,
+	};
 };
 
+const getTechnicianById = async (id: string) => {
+	const technician = await prisma.technicianProfile.findUnique({
+		where: {
+			id,
+		},
 
-/**
- * Get Technician By ID
- */
-const getTechnicianById = async (
-  id: string
-) => {
-  const technician =
-    await prisma.technicianProfile.findUnique({
-      where: {
-        id,
-      },
+		include: {
+			user: {
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					phone: true,
+					avatar: true,
+				},
+			},
+		},
+	});
 
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            avatar: true,
-          },
-        },
-      },
-    });
+	if (!technician) {
+		throw new AppError(httpStatus.NOT_FOUND, "Technician not found");
+	}
 
-  if (!technician) {
-    throw new AppError(
-      404,
-      "Technician not found"
-    );
-  }
-
-  return technician;
+	return technician;
 };
 
-/**
- * Toggle Availability
- */
-const toggleAvailability =
-  async (userId: string) => {
-    const profile =
-      await prisma.technicianProfile.findUnique({
-        where: {
-          userId,
-        },
-      });
+const toggleAvailability = async (userId: string) => {
+	const profile = await prisma.technicianProfile.findUnique({
+		where: {
+			userId,
+		},
+	});
 
-    if (!profile) {
-      throw new AppError(
-        404,
-        "Technician profile not found"
-      );
-    }
+	if (!profile) {
+		throw new AppError(httpStatus.NOT_FOUND, "Technician profile not found");
+	}
 
-    const updatedProfile =
-      await prisma.technicianProfile.update({
-        where: {
-          userId,
-        },
+	const updatedProfile = await prisma.technicianProfile.update({
+		where: {
+			userId,
+		},
 
-        data: {
-          isAvailable:
-            !profile.isAvailable,
-        },
-      });
+		data: {
+			isAvailable: !profile.isAvailable,
+		},
+	});
 
-    return updatedProfile;
-  };
+	return updatedProfile;
+};
 
 export const TechnicianService = {
-  createTechnicianProfile,
-  getMyTechnicianProfile,
-  updateMyTechnicianProfile,
-  getAllTechnicians,
-  getTechnicianById,
-  toggleAvailability,
+	createTechnicianProfile,
+	getMyTechnicianProfile,
+	updateMyTechnicianProfile,
+	getAllTechnicians,
+	getTechnicianById,
+	toggleAvailability,
 };
