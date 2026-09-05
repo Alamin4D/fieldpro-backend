@@ -14,6 +14,8 @@ import { ServiceRoutes } from "./app/module/service/service.route";
 import { TechnicianRoutes } from "./app/module/technician/technician.route";
 import { AvailabilityRoutes } from "./app/module/availability/availability.route";
 import { BookingRoutes } from "./app/module/booking/booking.route";
+import { PaymentRoutes } from "./app/module/payment/payment.route";
+import { PaymentController } from "./app/module/payment/payment.controller";
 
 const app: Application = express();
 
@@ -22,6 +24,12 @@ app.use(
 		origin: config.frontend_url,
 		credentials: true,
 	}),
+);
+
+app.post(
+	"/api/v1/payment/webhook",
+	express.raw({ type: "application/json" }),
+	PaymentController.stripeWebhook,
 );
 
 // Enable URL-encoded form data parsing
@@ -36,6 +44,7 @@ app.use("/api/v1/service", ServiceRoutes);
 app.use("/api/v1/technician", TechnicianRoutes);
 app.use("/api/v1/availability", AvailabilityRoutes);
 app.use("/api/v1/booking", BookingRoutes);
+app.use("/api/v1/payment", PaymentRoutes);
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {

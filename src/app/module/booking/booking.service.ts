@@ -22,7 +22,6 @@ const createBooking = async (
 	} = payload;
 
 	const result = await prisma.$transaction(async (tx) => {
-
 		const customer = await tx.user.findUnique({
 			where: {
 				id: customerId,
@@ -32,7 +31,6 @@ const createBooking = async (
 		if (!customer) {
 			throw new AppError(httpStatus.NOT_FOUND, "Customer not found");
 		}
-
 
 		const technician = await tx.technicianProfile.findUnique({
 			where: {
@@ -45,7 +43,10 @@ const createBooking = async (
 		}
 
 		if (!technician.isAvailable) {
-			throw new AppError(httpStatus.BAD_REQUEST, "Technician is currently unavailable");
+			throw new AppError(
+				httpStatus.BAD_REQUEST,
+				"Technician is currently unavailable",
+			);
 		}
 
 		const service = await tx.service.findUnique({
@@ -59,9 +60,11 @@ const createBooking = async (
 		}
 
 		if (!service.isActive) {
-			throw new AppError(httpStatus.BAD_REQUEST, "This service is currently inactive");
+			throw new AppError(
+				httpStatus.BAD_REQUEST,
+				"This service is currently inactive",
+			);
 		}
-
 
 		const availability = await tx.availability.findUnique({
 			where: {
@@ -73,7 +76,6 @@ const createBooking = async (
 			throw new AppError(httpStatus.NOT_FOUND, "Availability slot not found");
 		}
 
-
 		if (availability.technicianId !== technicianId) {
 			throw new AppError(
 				httpStatus.BAD_REQUEST,
@@ -81,11 +83,12 @@ const createBooking = async (
 			);
 		}
 
-
 		if (availability.isBooked) {
-			throw new AppError(httpStatus.CONFLICT, "This availability slot is already booked");
+			throw new AppError(
+				httpStatus.CONFLICT,
+				"This availability slot is already booked",
+			);
 		}
-
 
 		const existingBooking = await tx.booking.findFirst({
 			where: {
@@ -102,7 +105,6 @@ const createBooking = async (
 				"This availability slot has already been requested",
 			);
 		}
-
 
 		const booking = await tx.booking.create({
 			data: {
@@ -147,7 +149,6 @@ const createBooking = async (
 			},
 		});
 
-
 		await tx.availability.update({
 			where: {
 				id: availabilityId,
@@ -164,11 +165,9 @@ const createBooking = async (
 };
 
 const getCustomerBookings = async (customerId: string, query: BookingQuery) => {
-
 	const page = Number(query.page) || 1;
 	const limit = Number(query.limit) || 10;
 	const skip = (page - 1) * limit;
-
 
 	const where: Prisma.BookingWhereInput = {
 		customerId,
@@ -177,7 +176,6 @@ const getCustomerBookings = async (customerId: string, query: BookingQuery) => {
 	if (query.status) {
 		where.status = query.status;
 	}
-
 
 	const [bookings, total] = await prisma.$transaction([
 		prisma.booking.findMany({
@@ -333,7 +331,10 @@ const getBookingById = async (bookingId: string, userId: string) => {
 	const isTechnician = technician?.id === booking.technicianId;
 
 	if (!isCustomer && !isTechnician) {
-		throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to view this booking");
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"You are not allowed to view this booking",
+		);
 	}
 
 	return booking;
@@ -363,11 +364,17 @@ const updateBookingStatus = async (
 	});
 
 	if (!technician) {
-		throw new AppError(httpStatus.FORBIDDEN, "Only technician can update booking status");
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"Only technician can update booking status",
+		);
 	}
 
 	if (booking.technicianId !== technician.id) {
-		throw new AppError(httpStatus.FORBIDDEN, "You can only update your own bookings");
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"You can only update your own bookings",
+		);
 	}
 
 	const currentStatus = booking.status;

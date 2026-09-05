@@ -1,0 +1,113 @@
+import { NextFunction, Request, Response } from "express";
+import { sendResponse } from "../../utils/sendResponse";
+import { PaymentService } from "./payment.service";
+
+const createCheckoutSession = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const result = await PaymentService.createCheckoutSession(
+			req.user!.userId,
+			req.body.bookingId,
+		);
+
+		sendResponse(res, {
+			statusCode: 201,
+			success: true,
+			message: "Stripe checkout session created successfully",
+			data: result,
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
+const stripeWebhook = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	const signature = req.headers["stripe-signature"];
+
+	if (!signature) {
+		return res.status(400).json({
+			success: false,
+			message: "Stripe signature is missing",
+			errors: [],
+		});
+	}
+
+	try {
+		const result = await PaymentService.handleStripeWebhook(
+			req.body,
+			signature as string,
+		);
+
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "Webhook processed successfully",
+			data: result,
+		});
+	} catch (error: any) {
+		console.error(error.message);
+
+		return res.status(error.statusCode || 500).json({
+			success: false,
+			message: error.message || "Webhook processing failed",
+		});
+	}
+};
+
+const getCustomerPayments = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const result = await PaymentService.getCustomerPayments(
+			req.user!.userId,
+			req.query as any,
+		);
+
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "Customer payments retrieved successfully",
+			data: result,
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
+const getPaymentById = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const result = await PaymentService.getPaymentById(
+			req.params.id as string,
+			req.user!.userId,
+		);
+
+		sendResponse(res, {
+			statusCode: 200,
+			success: true,
+			message: "Payment retrieved successfully",
+			data: result,
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const PaymentController = {
+	createCheckoutSession,
+	stripeWebhook,
+	getCustomerPayments,
+	getPaymentById,
+};
