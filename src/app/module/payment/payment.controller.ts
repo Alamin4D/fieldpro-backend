@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { sendResponse } from "../../utils/sendResponse";
 import { PaymentService } from "./payment.service";
+import httpStatus from "http-status";
 
 const createCheckoutSession = async (
 	req: Request,
@@ -14,7 +15,7 @@ const createCheckoutSession = async (
 		);
 
 		sendResponse(res, {
-			statusCode: 201,
+			statusCode: httpStatus.CREATED,
 			success: true,
 			message: "Stripe checkout session created successfully",
 			data: result,
@@ -32,7 +33,7 @@ const stripeWebhook = async (
 	const signature = req.headers["stripe-signature"];
 
 	if (!signature) {
-		return res.status(400).json({
+		return res.status(httpStatus.BAD_REQUEST).json({
 			success: false,
 			message: "Stripe signature is missing",
 			errors: [],
@@ -46,7 +47,7 @@ const stripeWebhook = async (
 		);
 
 		sendResponse(res, {
-			statusCode: 200,
+			statusCode: httpStatus.OK,
 			success: true,
 			message: "Webhook processed successfully",
 			data: result,
@@ -73,7 +74,7 @@ const getCustomerPayments = async (
 		);
 
 		sendResponse(res, {
-			statusCode: 200,
+			statusCode: httpStatus.OK,
 			success: true,
 			message: "Customer payments retrieved successfully",
 			data: result,
@@ -95,7 +96,7 @@ const getPaymentById = async (
 		);
 
 		sendResponse(res, {
-			statusCode: 200,
+			statusCode: httpStatus.OK,
 			success: true,
 			message: "Payment retrieved successfully",
 			data: result,

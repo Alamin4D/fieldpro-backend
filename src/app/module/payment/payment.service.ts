@@ -7,6 +7,7 @@ import {
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import { Prisma } from "../../../generated/prisma/client";
+import httpStatus from "http-status";
 
 interface PaymentQuery {
 	status?: PaymentStatus;
@@ -42,32 +43,41 @@ const createCheckoutSession = async (customerId: string, bookingId: string) => {
 	});
 
 	if (!booking) {
-		throw new AppError(404, "Booking not found");
+		throw new AppError(httpStatus.NOT_FOUND, "Booking not found");
 	}
 
 	if (booking.customerId !== customerId) {
-		throw new AppError(403, "You can only pay for your own booking");
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"You can only pay for your own booking",
+		);
 	}
 
 	if (booking.status !== BookingStatus.ACCEPTED) {
-		throw new AppError(400, "Payment is only available for accepted bookings");
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"Payment is only available for accepted bookings",
+		);
 	}
 
 	if (booking.payment?.status === PaymentStatus.PAID) {
-		throw new AppError(400, "This booking has already been paid");
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"This booking has already been paid",
+		);
 	}
 
 	const amount = Number(booking.totalAmount);
 
 	if (!Number.isFinite(amount) || amount <= 0) {
-		throw new AppError(400, "Invalid booking amount");
+		throw new AppError(httpStatus.BAD_REQUEST, "Invalid booking amount");
 	}
 
 	/*
 	 * Stripe amount is in smallest currency unit.
 	 *
 	 * For USD:
-	 * $50 = 5000 cents
+	 * $50 = httpStatus.INTERNAL_SERVER_ERROR0 cents
 	 */
 	const stripeAmount = Math.round(amount * 100);
 
@@ -153,7 +163,10 @@ const handleStripeWebhook = async (rawBody: Buffer, signature: string) => {
 	const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 	if (!webhookSecret) {
-		throw new AppError(500, "Stripe webhook secret is not configured");
+		throw new AppError(
+			httpStatus.INTERNAL_SERVER_ERROR,
+			"Stripe webhook secret is not configured",
+		);
 	}
 
 	let event: Stripe.Event;
@@ -161,7 +174,10 @@ const handleStripeWebhook = async (rawBody: Buffer, signature: string) => {
 	try {
 		event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
 	} catch (error) {
-		throw new AppError(400, "Invalid Stripe webhook signature");
+		throw new AppError(
+			httpStatus.BAD_REQUEST,
+			"Invalid Stripe webhook signature",
+		);
 	}
 
 	if (event.type === "checkout.session.completed") {
@@ -170,7 +186,10 @@ const handleStripeWebhook = async (rawBody: Buffer, signature: string) => {
 		const bookingId = session.metadata?.bookingId;
 
 		if (!bookingId) {
-			throw new AppError(400, "Booking ID missing from Stripe session");
+			throw new AppError(
+				httpStatus.BAD_REQUEST,
+				"Booking ID missing from Stripe session",
+			);
 		}
 
 		const transactionId =
@@ -190,7 +209,7 @@ const handleStripeWebhook = async (rawBody: Buffer, signature: string) => {
 			});
 
 			if (!booking) {
-				throw new AppError(404, "Booking not found");
+				throw new AppError(httpStatus.NOT_FOUND, "Booking not found");
 			}
 
 			if (booking.payment?.status === PaymentStatus.PAID) {
@@ -348,11 +367,14 @@ const getPaymentById = async (paymentId: string, customerId: string) => {
 	});
 
 	if (!payment) {
-		throw new AppError(404, "Payment not found");
+		throw new AppError(httpStatus.NOT_FOUND, "Payment not found");
 	}
 
 	if (payment.booking.customerId !== customerId) {
-		throw new AppError(403, "You are not allowed to view this payment");
+		throw new AppError(
+			httpStatus.FORBIDDEN,
+			"You are not allowed to view this payment",
+		);
 	}
 
 	return payment;
