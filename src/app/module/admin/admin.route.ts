@@ -52,9 +52,7 @@ router.get(
 	AdminController.getBookings,
 );
 
-// ==========================================
-// Payments
-// ==========================================
+
 
 router.get("/payments", auth(Role.ADMIN), AdminController.getPayments);
 
