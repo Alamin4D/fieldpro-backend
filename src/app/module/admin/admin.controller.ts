@@ -1,10 +1,13 @@
 import { Request, Response } from "express";
 import { AdminService } from "./admin.service";
+import { sendResponse } from "../../utils/sendResponse";
+import httpStatus from "http-status"
 
 const getDashboardStats = async (_req: Request, res: Response) => {
 	const result = await AdminService.getDashboardStats();
 
-	res.status(200).json({
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
 		success: true,
 		message: "Admin dashboard statistics retrieved successfully",
 		data: result,
@@ -22,7 +25,8 @@ const getUsers = async (req: Request, res: Response) => {
 		},
 	);
 
-	res.status(200).json({
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
 		success: true,
 		message: "Users retrieved successfully",
 		data: result,
@@ -34,7 +38,8 @@ const getUserById = async (req: Request, res: Response) => {
 
 	const result = await AdminService.getUserById(id as string);
 
-	res.status(200).json({
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
 		success: true,
 		message: "User retrieved successfully",
 		data: result,
@@ -51,7 +56,8 @@ const updateUserStatus = async (req: Request, res: Response) => {
 		req.body.status,
 	);
 
-	res.status(200).json({
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
 		success: true,
 		message: "User status updated successfully",
 		data: result,
@@ -64,7 +70,8 @@ const deleteUser = async (req: Request, res: Response) => {
 
 	await AdminService.deleteUser(adminId, id as string);
 
-	res.status(200).json({
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
 		success: true,
 		message: "User deleted successfully",
 		data: null,
@@ -80,7 +87,8 @@ const getBookings = async (req: Request, res: Response) => {
 		},
 	);
 
-	res.status(200).json({
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
 		success: true,
 		message: "Bookings retrieved successfully",
 		data: result,
@@ -95,7 +103,8 @@ const getPayments = async (req: Request, res: Response) => {
 		},
 	);
 
-	res.status(200).json({
+	sendResponse(res,{
+		statusCode: httpStatus.OK,
 		success: true,
 		message: "Payments retrieved successfully",
 		data: result,

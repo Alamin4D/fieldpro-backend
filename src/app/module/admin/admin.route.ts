@@ -13,15 +13,10 @@ import { AdminController } from "./admin.controller";
 
 const router = Router();
 
-// ==========================================
-// Dashboard
-// ==========================================
 
 router.get("/dashboard", auth(Role.ADMIN), AdminController.getDashboardStats);
 
-// ==========================================
-// Users
-// ==========================================
+
 
 router.get(
 	"/users",
@@ -41,9 +36,7 @@ router.patch(
 
 router.delete("/users/:id", auth(Role.ADMIN), AdminController.deleteUser);
 
-// ==========================================
-// Bookings
-// ==========================================
+
 
 router.get(
 	"/bookings",
