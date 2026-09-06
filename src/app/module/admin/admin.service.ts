@@ -8,6 +8,7 @@ import {
 
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
+import httpStatus from "http-status"
 
 const getDashboardStats = async () => {
 	const [
@@ -232,7 +233,7 @@ const getUserById = async (userId: string) => {
 	});
 
 	if (!user) {
-		throw new AppError(404, "User not found");
+		throw new AppError(httpStatus.NOT_FOUND, "User not found");
 	}
 
 	return user;
@@ -244,7 +245,7 @@ const updateUserStatus = async (
 	status: "ACTIVE" | "INACTIVE" | "BANNED",
 ) => {
 	if (adminId === userId) {
-		throw new AppError(400, "Admin cannot change their own status");
+		throw new AppError(httpStatus.BAD_REQUEST, "Admin cannot change their own status");
 	}
 
 	const user = await prisma.user.findUnique({
@@ -254,11 +255,11 @@ const updateUserStatus = async (
 	});
 
 	if (!user) {
-		throw new AppError(404, "User not found");
+		throw new AppError(httpStatus.NOT_FOUND, "User not found");
 	}
 
 	if (user.role === Role.ADMIN) {
-		throw new AppError(403, "Admin user status cannot be changed");
+		throw new AppError(httpStatus.FORBIDDEN, "Admin user status cannot be changed");
 	}
 
 	const updatedUser = await prisma.user.update({
@@ -283,7 +284,7 @@ const updateUserStatus = async (
 
 const deleteUser = async (adminId: string, userId: string) => {
 	if (adminId === userId) {
-		throw new AppError(400, "Admin cannot delete their own account");
+		throw new AppError(httpStatus.BAD_REQUEST, "Admin cannot delete their own account");
 	}
 
 	const user = await prisma.user.findUnique({
@@ -293,11 +294,11 @@ const deleteUser = async (adminId: string, userId: string) => {
 	});
 
 	if (!user) {
-		throw new AppError(404, "User not found");
+		throw new AppError(httpStatus.NOT_FOUND, "User not found");
 	}
 
 	if (user.role === Role.ADMIN) {
-		throw new AppError(403, "Admin users cannot be deleted");
+		throw new AppError(httpStatus.FORBIDDEN, "Admin users cannot be deleted");
 	}
 
 	await prisma.user.delete({
